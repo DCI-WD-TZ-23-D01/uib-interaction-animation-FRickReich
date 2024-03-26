@@ -1,0 +1,175 @@
+/* wir setzen die schrift auf sans-serif, da es wohl eine sans-serif schrift sein wird, die hier benutzt wird */
+body {
+    font-family: sans-serif;
+}
+
+/* wir erstellen eine variable für die animationsdauer */
+:root {
+    --animation-duration: 1s;
+}
+
+/* wir stylen den wrapper für den inhalt, dieser wird jetzt zwar beim scrollen kaputt gehen, später aber richtig funtionieren, wenn die images kleiner und positioniert sind. */
+.page {
+    height: 100vh;
+    /* die farbe mistyrose scheint zu passen */
+    background: mistyrose;
+    /* wir setzen die inhalte auf display: flex; mit kompletter zentrierung, um alles später in der mitte zu haben */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* da der inhalt noch einen wrapper hat, um alle inhalte die innerhalb des page containers sind zu positionieren, geben wir diesem eine feste größe */
+.page .processing-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 300px;
+}
+
+/* wir setzen die größe der bilder auf 100px */
+.processing-item img {
+    display: block;
+    width: 100px;
+}
+
+/* jetzt stylen wir die items selbst */
+.processing-item {
+    /* mit einem weiteren debug border zeigen wir, wo die elemente sind */
+    /* mit position und flex setzen wir das jeweilige element in die mitte des inhaltes */
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    /* wir setzen die animationslänge ein */
+    animation-duration: var(--animation-duration);
+    /* jetzt verstecken wir die bilder mit opacity, die dies im gegensatz zu visibility und display: none; eine einstellbare sichtbarkeit hat */
+    opacity: 0;
+}
+
+/* jetzt stylen wir noch den text */
+.processing-label {
+    /* für bessere sichtbarkeit erstellen wir einen debug border */
+    /* um das element an die untere seite unserer box zu kriegen, setzen wir das label auf position: absolute; und bottom: 0; */
+    position: absolute;
+    bottom: 0;
+    /* optional können wir hier auch noch besser die position steuern indem wir folgendes nutzen: */
+    display: block;
+    width: 100%;
+    text-align: center;
+    /* die länge der animation beträgt auch hier 1 sekunde */
+    animation-duration: var(--animation-duration);
+    /* wir setzen jetzt auch hier die opacity auf 0 */
+    opacity: 0;
+}
+
+/* jetzt benötigen wir 3 keyframe animationen. Eine soll erscheinen und am ende verschwinden, eine soll am anfang erscheinen  und dann bleiben, und eine soll den text blinken lassen. */
+
+/* animation fürs erscheinen und verschwinden */
+@keyframes fade-in-out {
+    /* als erstes erstellen wir die keyframes so, das wir sehen, das die elemente erscheinen und verschwinden */
+    0% {
+        opacity: 0;
+
+        /* erst jetzt, wo wir sehen, das die animation abläuft, kümmern  wir uns um die details der animation */
+
+        /* das element soll von rechts in die mitte kommen, und ein wenig kleiner starten */
+        transform: scale(0.8) translateX(300%);
+    }
+    25% {
+        /* das element soll größer werden und dabei leicht nach oben gehen, der effekt ist jetzt: das wir das gefühl haben, das element wird danach wieder kleiner, da es vershucht bei 100% wieder die scale von 1 zu erreichen. */
+        transform: scale(1.2) translateY(-5%) translateX(0);
+        opacity: 1;
+    }
+    50% {
+        /* wir wollen, dass das element jetzt wieder nach unten geht, da wir die größe an dieser stelle noch so haben wollen, wie bei 25%, setzen wir auch hier die scale wieder auf den wert von oben */
+        transform: scale(1.2) translateY(5%);
+        opacity: 1;
+    }
+    85% {
+        /* jetzt wollen wir, dass das element kleiner wird, und ändern die scale auf 1 */
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        /* jetzt wollen wir, dass das element links verschwindet und dabei auch ein wenig kleiner wird */
+        transform: scale(0.8) translateX(-300%);
+        opacity: 0;
+    }
+}
+
+/* animation fürs ersheinen des letzten bildes */
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-300%);
+    }
+    25% {
+        opacity: 1;
+        transform: scale(1) translateY(15%);
+    }
+    50% {
+        transform: scale(1) translateY(-15%);
+    }
+    85% {
+        transform: scale(1) translateY(5%);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* animation fürs blinken des textes */
+@keyframes blink {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.processing-item:nth-child(1) {
+    animation-name: fade-in-out;
+    /* die animation des ersten elementes soll 1 mal durchlaufen */
+    animation-iteration-count: 1; 
+}
+
+.processing-item:nth-child(2) {
+    animation-name: fade-in-out;
+    /* diese animation soll 3 mal durchlaufen */
+    animation-iteration-count: 3;
+    /* da das element erst nach der ersten animation erscheinen soll, setzen wir ein deleay auf die zeit, die das erste element benötigt um durchzulaufen, so startet die animation direkt danach */
+    animation-delay: var(--animation-duration);
+}
+.processing-item:nth-child(3) {
+    /* beim dritten element nutzen wir die fade-in animation */
+    animation-name: fade-in;
+    /* diese animation soll nur 1 mal durchlaufen */
+    animation-iteration-count: 1;
+    /* wir warten mit dieser animation, bis die anderen beiden elemente animiert wurden, da das erste element 1 mal animiert wurde, und das zweite element 3 mal, ergibt das 4 mal die animationszeit */
+    animation-delay: calc(var(--animation-duration) * 4);
+    /* der animation fill mode sagt aus, was mit der animation passiert, wenn sie durchgelaufen ist, "forwards" bedeutet, das die animation am ende stehen bleibt, so sorgen wir dafür, das die animation am ende nicht resettet wird, und unser element einfach dort bleibt wo es am ende war.*/
+    animation-fill-mode: forwards;
+}
+
+.processing-label {
+    /* für unser label nutzen wir die animation blink */
+    animation-name: blink;
+}
+
+/* da wir 2 elemente für das processing label haben, die an verschiedenen zeiten erscheinen sollen, geben wir ihnen eigenen optionen. */
+.processing-label:nth-of-type(1) {
+    /* die animation soll 4 mal durchlaufen */
+    animation-iteration-count: 4;
+}
+.processing-label:nth-of-type(2) {
+    /* die animation soll nur einmal durchlaufen */
+    animation-iteration-count: 1;
+    /* für das delay berechnen wir die animationsdauer mal 4 */
+    animation-delay: calc(var(--animation-duration) * 4);
+    /* wir wollen, das am ende die animation stehen bleibt */
+    animation-fill-mode: forwards;
+}
